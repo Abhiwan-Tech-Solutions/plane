@@ -42,13 +42,19 @@ class S3Storage(S3Boto3Storage):
                 endpoint_protocol = "https"
             else:
                 endpoint_protocol = request.scheme if request else "http"
+            # Use MINIO_URL if set (no-proxy setup), otherwise fall back to request host (proxy setup)
+            minio_url = os.environ.get("MINIO_URL")
+            if minio_url:
+                resolved_endpoint = minio_url
+            else:
+                resolved_endpoint = (f"{endpoint_protocol}://{request.get_host()}" if request else self.aws_s3_endpoint_url)
             # Create an S3 client for MinIO
             self.s3_client = boto3.client(
                 "s3",
                 aws_access_key_id=self.aws_access_key_id,
                 aws_secret_access_key=self.aws_secret_access_key,
                 region_name=self.aws_region,
-                endpoint_url=(f"{endpoint_protocol}://{request.get_host()}" if request else self.aws_s3_endpoint_url),
+                endpoint_url=resolved_endpoint,
                 config=boto3.session.Config(signature_version="s3v4"),
             )
         else:
