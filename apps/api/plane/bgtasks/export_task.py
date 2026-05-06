@@ -4,7 +4,6 @@
 
 # Python imports
 import io
-import os
 import zipfile
 from typing import List
 import boto3
@@ -63,15 +62,11 @@ def upload_to_s3(zip_file: io.BytesIO, workspace_id: UUID, token_id: str, slug: 
         )
 
         # Generate presigned url for the uploaded file with different base
-        minio_url = os.environ.get("MINIO_URL", None)
-        presign_endpoint = (
-            minio_url
-            if minio_url
-            else f"{settings.AWS_S3_URL_PROTOCOL}//{str(settings.AWS_S3_CUSTOM_DOMAIN).replace('/uploads', '')}/"
-        )
         presign_s3 = boto3.client(
             "s3",
-            endpoint_url=presign_endpoint,
+            endpoint_url=(
+                f"{settings.AWS_S3_URL_PROTOCOL}//{str(settings.AWS_S3_CUSTOM_DOMAIN).replace('/uploads', '')}/"
+            ),
             aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
             aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
             config=Config(signature_version="s3v4"),

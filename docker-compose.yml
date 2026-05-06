@@ -6,19 +6,9 @@ services:
       dockerfile: ./apps/web/Dockerfile.web
       args:
         DOCKER_BUILDKIT: 1
-        VITE_API_BASE_URL: "http://localhost:8000"
-        VITE_WEB_BASE_URL: "http://localhost:3000"
-        VITE_ADMIN_BASE_URL: "http://localhost:3001"
-        VITE_ADMIN_BASE_PATH: "/god-mode"
-        VITE_SPACE_BASE_URL: "http://localhost:3002"
-        VITE_SPACE_BASE_PATH: "/spaces"
-        VITE_LIVE_BASE_URL: "http://localhost:3100"
-        VITE_LIVE_BASE_PATH: "/live"
     restart: always
     depends_on:
       - api
-    ports:
-    - "3000:3000"
 
   admin:
     container_name: admin
@@ -27,20 +17,10 @@ services:
       dockerfile: ./apps/admin/Dockerfile.admin
       args:
         DOCKER_BUILDKIT: 1
-        VITE_API_BASE_URL: "http://localhost:8000"
-        VITE_WEB_BASE_URL: "http://localhost:3000"
-        VITE_ADMIN_BASE_URL: "http://localhost:3001"
-        VITE_ADMIN_BASE_PATH: "/god-mode"
-        VITE_SPACE_BASE_URL: "http://localhost:3002"
-        VITE_SPACE_BASE_PATH: "/spaces"
-        VITE_LIVE_BASE_URL: "http://localhost:3100"
-        VITE_LIVE_BASE_PATH: "/live"
     restart: always
     depends_on:
       - api
       - web
-    ports:
-      - "3001:3000"
 
   space:
     container_name: space
@@ -49,20 +29,10 @@ services:
       dockerfile: ./apps/space/Dockerfile.space
       args:
         DOCKER_BUILDKIT: 1
-        VITE_API_BASE_URL: "http://localhost:8000"
-        VITE_WEB_BASE_URL: "http://localhost:3000"
-        VITE_ADMIN_BASE_URL: "http://localhost:3001"
-        VITE_ADMIN_BASE_PATH: "/god-mode"
-        VITE_SPACE_BASE_URL: "http://localhost:3002"
-        VITE_SPACE_BASE_PATH: "/spaces"
-        VITE_LIVE_BASE_URL: "http://localhost:3100"
-        VITE_LIVE_BASE_PATH: "/live"
     restart: always
     depends_on:
       - api
       - web
-    ports:
-      - "3002:3000"
 
   api:
     container_name: api
@@ -78,9 +48,6 @@ services:
     depends_on:
       - plane-db
       - plane-redis
-      - plane-mq
-    ports:
-      - "8000:8000"
 
   worker:
     container_name: bgworker
@@ -137,20 +104,6 @@ services:
       args:
         DOCKER_BUILDKIT: 1
     restart: always
-    depends_on:
-      - api
-      - plane-redis
-    environment:
-      PORT: "3000"
-      API_BASE_URL: "http://api:8000"
-      CORS_ALLOWED_ORIGINS: "http://localhost:3000,http://localhost:3001,http://localhost:3002"
-      LIVE_BASE_PATH: "/live"
-      LIVE_SERVER_SECRET_KEY: "secret-key"
-      REDIS_HOST: "plane-redis"
-      REDIS_PORT: "6379"
-      REDIS_URL: "redis://plane-redis:6379/"
-    ports:
-      - "3100:3000"
 
   plane-db:
     container_name: plane-db
@@ -197,11 +150,25 @@ services:
     environment:
       MINIO_ROOT_USER: ${AWS_ACCESS_KEY_ID}
       MINIO_ROOT_PASSWORD: ${AWS_SECRET_ACCESS_KEY}
+
+  # Comment this if you already have a reverse proxy running
+  proxy:
+    container_name: proxy
+    build:
+      context: ./apps/proxy
+      dockerfile: Dockerfile.ce
+    restart: always
     ports:
-      - "9000:9000"
-      - "9090:9090"
-
-
+      - ${LISTEN_HTTP_PORT}:80
+      - ${LISTEN_HTTPS_PORT}:443
+    environment:
+      FILE_SIZE_LIMIT: ${FILE_SIZE_LIMIT:-5242880}
+      BUCKET_NAME: ${AWS_S3_BUCKET_NAME:-uploads}
+    depends_on:
+      - web
+      - api
+      - space
+      - admin
 
 volumes:
   pgdata:
