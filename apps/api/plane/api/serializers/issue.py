@@ -480,52 +480,44 @@ class IssueLinkSerializer(BaseSerializer):
         ]
 
 
-class IssueRelationRefSerializer(serializers.Serializer):
-    """Project-scoped reference to a related work item."""
-
-    project_id = serializers.UUIDField(help_text="Project containing the related work item")
-    issue_id = serializers.UUIDField(help_text="ID of the related work item")
-
-
 class IssueRelationResponseSerializer(serializers.Serializer):
     """
     Serializer for issue relations response showing grouped relation types.
 
-    Each list contains project_id and issue_id pairs so clients can resolve
-    cross-project relations.
+    Returns issue IDs organized by relation type for efficient client-side processing.
     """
 
     blocking = serializers.ListField(
-        child=IssueRelationRefSerializer(),
-        help_text="Work items blocking this issue",
+        child=serializers.UUIDField(),
+        help_text="List of issue IDs that are blocking this issue",
     )
     blocked_by = serializers.ListField(
-        child=IssueRelationRefSerializer(),
-        help_text="Work items this issue is blocked by",
+        child=serializers.UUIDField(),
+        help_text="List of issue IDs that this issue is blocked by",
     )
     duplicate = serializers.ListField(
-        child=IssueRelationRefSerializer(),
-        help_text="Duplicate work items",
+        child=serializers.UUIDField(),
+        help_text="List of issue IDs that are duplicates of this issue",
     )
     relates_to = serializers.ListField(
-        child=IssueRelationRefSerializer(),
-        help_text="Related work items",
+        child=serializers.UUIDField(),
+        help_text="List of issue IDs that relate to this issue",
     )
     start_after = serializers.ListField(
-        child=IssueRelationRefSerializer(),
-        help_text="Work items that start after this issue",
+        child=serializers.UUIDField(),
+        help_text="List of issue IDs that start after this issue",
     )
     start_before = serializers.ListField(
-        child=IssueRelationRefSerializer(),
-        help_text="Work items that start before this issue",
+        child=serializers.UUIDField(),
+        help_text="List of issue IDs that start before this issue",
     )
     finish_after = serializers.ListField(
-        child=IssueRelationRefSerializer(),
-        help_text="Work items that finish after this issue",
+        child=serializers.UUIDField(),
+        help_text="List of issue IDs that finish after this issue",
     )
     finish_before = serializers.ListField(
-        child=IssueRelationRefSerializer(),
-        help_text="Work items that finish before this issue",
+        child=serializers.UUIDField(),
+        help_text="List of issue IDs that finish before this issue",
     )
 
 

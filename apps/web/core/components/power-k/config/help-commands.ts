@@ -9,6 +9,7 @@ import { FileText, GithubIcon, MessageSquare, Rocket } from "lucide-react";
 import type { TPowerKCommandConfig } from "@/components/power-k/core/types";
 // hooks
 import { usePowerK } from "@/hooks/store/use-power-k";
+import { useChatSupport } from "@/hooks/use-chat-support";
 
 /**
  * Help commands - Help related commands
@@ -16,6 +17,7 @@ import { usePowerK } from "@/hooks/store/use-power-k";
 export const usePowerKHelpCommands = (): TPowerKCommandConfig[] => {
   // store
   const { toggleShortcutsListModal } = usePowerK();
+  const { isEnabled: isChatSupportEnabled, openChatSupport } = useChatSupport();
 
   return [
     {
@@ -67,6 +69,17 @@ export const usePowerKHelpCommands = (): TPowerKCommandConfig[] => {
       },
       isEnabled: () => true,
       isVisible: () => true,
+      closeOnSelect: true,
+    },
+    {
+      id: "chat_with_us",
+      type: "action",
+      group: "help",
+      i18n_title: "power_k.help_actions.chat_with_us",
+      icon: MessageSquare,
+      action: () => openChatSupport(),
+      isEnabled: () => isChatSupportEnabled,
+      isVisible: () => isChatSupportEnabled,
       closeOnSelect: true,
     },
   ];

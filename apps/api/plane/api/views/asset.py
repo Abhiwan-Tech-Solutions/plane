@@ -17,7 +17,6 @@ from drf_spectacular.utils import OpenApiExample, OpenApiRequest
 # Module Imports
 from plane.bgtasks.storage_metadata_task import get_asset_object_metadata
 from plane.settings.storage import S3Storage
-from plane.utils.path_validator import sanitize_filename
 from plane.db.models import FileAsset, User, Workspace
 from plane.api.views.base import BaseAPIView
 from plane.api.serializers import (
@@ -115,7 +114,7 @@ class UserAssetEndpoint(BaseAPIView):
         This endpoint generates the necessary credentials for direct S3 upload.
         """
         # get the asset key
-        name = sanitize_filename(request.data.get("name")) or "unnamed"
+        name = request.data.get("name")
         type = request.data.get("type", "image/jpeg")
         size = int(request.data.get("size", settings.FILE_SIZE_LIMIT))
         entity_type = request.data.get("entity_type", False)
@@ -288,7 +287,7 @@ class UserServerAssetEndpoint(BaseAPIView):
         necessary credentials for direct S3 upload with server-side authentication.
         """
         # get the asset key
-        name = sanitize_filename(request.data.get("name")) or "unnamed"
+        name = request.data.get("name")
         type = request.data.get("type", "image/jpeg")
         size = int(request.data.get("size", settings.FILE_SIZE_LIMIT))
         entity_type = request.data.get("entity_type", False)
@@ -499,7 +498,7 @@ class GenericAssetEndpoint(BaseAPIView):
         Create a presigned URL for uploading generic assets that can be bound to entities like work items.
         Supports various file types and includes external source tracking for integrations.
         """
-        name = sanitize_filename(request.data.get("name"))
+        name = request.data.get("name")
         type = request.data.get("type")
         size = int(request.data.get("size", settings.FILE_SIZE_LIMIT))
         project_id = request.data.get("project_id")

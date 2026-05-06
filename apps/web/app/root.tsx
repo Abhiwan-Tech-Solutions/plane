@@ -58,7 +58,7 @@ export function Layout({ children }: { children: ReactNode }) {
   const isSessionRecorderEnabled = parseInt(process.env.VITE_ENABLE_SESSION_RECORDER || "0");
 
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning style={{ backgroundColor: '#ffffff' }}>
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -139,7 +139,7 @@ export function HydrateFallback() {
   if (typeof window === "undefined" || resolvedTheme === undefined) return <div />;
 
   return (
-    <div className="relative flex h-screen w-full items-center justify-center bg-canvas">
+    <div className="relative flex h-screen w-full items-center justify-center" style={{ backgroundColor: '#ffffff' }}>
       <LogoSpinner />
     </div>
   );

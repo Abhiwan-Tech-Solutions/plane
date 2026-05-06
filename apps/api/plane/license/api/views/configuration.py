@@ -45,8 +45,7 @@ class InstanceConfigurationEndpoint(BaseAPIView):
 
         bulk_configurations = []
         for configuration in configurations:
-            raw_value = request.data.get(configuration.key, configuration.value)
-            value = "" if raw_value is None else str(raw_value).strip()
+            value = request.data.get(configuration.key, configuration.value)
             if configuration.is_encrypted:
                 configuration.value = encrypt_data(value)
             else:
